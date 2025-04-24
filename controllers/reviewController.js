@@ -1,0 +1,202 @@
+import { Review } from "../models/userModel.js";
+
+export async function createReview(req, res) {
+    /*
+        this function just creating a review in the database
+        Returned Values:
+        status: "Success" or "fail"
+        data: the review object if it was successfully created
+        message: the error message if it was not successfully created
+    */ 
+    try {
+        const { review, rating, createdAt, user_id } = req.body;
+        const newReview = await Review.create({ review, rating, createdAt, user_id });
+        res.status(201).json({
+            status: "Successfully Create Review",
+            data: { review: newReview },
+        });
+    } catch (err) {
+        console.log(err); // for Debugging
+        res.status(400).json({
+            status: "fail",
+            message: err.message,
+        });
+    }
+}
+export async function getAllReviews(req, res) {
+    /*
+        this function returns all the reviews in the database
+        Returned Values:
+        status: "Success" or "fail"
+        results: the number of reviews in the database
+        data: review object containing all the reviews in the database
+    */ 
+    try {
+        const reviews = await Review.find();
+        res.status(200).json({
+            status: "Success",
+            results: reviews.length,
+            data: { reviews },
+        });
+    } catch (err) {
+        console.log(err); // for Debugging
+        res.status(400).json({
+            status: "fail",
+            message: err.message,
+        });
+    }
+}
+
+
+export async function getReviewsByUserId(req, res) {
+    /*
+        this function returns all the reviews in the database for a specific user
+    http://localhost:8080/api/v1/review/get_Reviews_ByUserId/user_id
+    */ 
+    try{
+        const {user_id} = req.params;
+        const reviews = await Review.find({user_id:user_id});
+        if (!reviews.length) {
+            return res.status(404).json({
+                status: "fail",
+                message: "No reviews found for this user"
+            });
+        }
+
+        res.status(200).json({
+            status: "Success",
+            results: reviews.length,
+            data: { reviews },
+        });
+    }
+    catch(err){
+        console.log(err); // for Debugging
+        res.status(400).json({
+            status: "fail",
+            message: err.message
+        });
+    }
+}
+
+/*  Uncommented when we have tour module
+export async function getReviewsByTourId(req, res) {
+    /*
+        this function returns all the reviews in the database for a specific user
+    http://localhost:8080/api/v1/review/get_Reviews_ByTourId/tour_id
+    */ 
+   /*
+    try{
+        const {tour_id} = req.params;
+        const reviews = await Review.find({tour:tour_id});
+        if (!reviews.length) {
+            return res.status(404).json({
+                status: "fail",
+                message: "No reviews found for this user"
+            });
+        }
+
+        res.status(200).json({
+            status: "Success",
+            results: reviews.length,
+            data: { reviews },
+        });
+    }
+    catch(err){
+        console.log(err); // for Debugging
+        res.status(400).json({
+            status: "fail",
+            message: err.message
+        });
+    }
+}
+*/
+
+export async function deleteUserReviews(req,res){
+    /*
+    this function deletes all the reviews in the database for a specific user
+    http://localhost:8080/api/v1/review/delete_UserReview/user_id
+    */
+    try{
+        const { user_id } = req.params;
+        const review =  await Review.deleteMany({user_id:user_id});
+        if (review.deletedCount === 0) {
+            return res.status(404).json({
+                status: "fail",
+                message: "No reviews found for this user"
+            });
+        }
+        res.status(200).json({
+            status: "Success",
+            message: "Reviews deleted successfully"
+        });
+    } catch(error){
+        console.log(error); // for Debugging
+        res.status(400).json({
+            status: "fail",
+            message: error.message
+        });
+    }
+}
+
+export async function deleteReviewByReviewId(req,res){
+     /*
+    this function deletes a review in the database by its ID
+    http://localhost:8080/api/v1/review/delete_Review/review_id
+    */
+    try{
+        const { review_id } = req.params;
+        const review =  await Review.deleteOne({_id:review_id});
+        if (review.deletedCount === 0) {
+            return res.status(404).json({
+                status: "fail",
+                message: "No review found with this id"
+            });
+        }
+        res.status(200).json({
+            status: "Success",
+            message: "Review deleted successfully"
+        });
+    } catch(error){
+        console.log(error); // for Debugging
+        res.status(400).json({
+            status: "fail",
+            message: error.message
+        });
+    }
+    
+}
+
+export async function updateReviewByReviewId(req,res){
+    /*
+    this function updates a review in the database by its ID
+    http://localhost:8080/api/v1/review/update_Review/review_id
+    */ 
+    try{
+        const { review_id } = req.params;
+        const { review_body,rating } = req.body;
+        const review =  await Review.updateOne({_id:review_id}, { $set:{
+            review: review_body,
+            rating: rating,
+            createdAt:Date.now()
+        }  });
+        if (review.modifiedCount === 0) {
+            return res.status(404).json({
+                status: "fail",
+                message: "No review found with this id"
+            });
+        }
+        res.status(200).json({
+            status: "Success",
+            message: "Review updated successfully"
+        });
+    } 
+    catch(error){
+        console.log(error); // for Debugging
+        res.status(400).json({
+            status: "fail",
+            message: error.message
+        });
+    }
+
+
+}
