@@ -1,8 +1,8 @@
-const express = require('express');
-const tourController = require('../controllers/tourController');
+import express from "express";
+import { createTour } from "../controllers/tourController.js";
 
-const router = express.Router();
+const tourRouter = express.Router();
 
-router.post('/', tourController.createTour);
+tourRouter.route("/").post(createTour);
 
-module.exports = router;
+export default tourRouter;

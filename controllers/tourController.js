@@ -1,7 +1,6 @@
-const Tour = require('../models/tourModel');
+import Tour from "../models/tourModel.js";
 
-
-exports.createTour = async (req, res) => {
+export async function createTour(req, res)  {
   try {
     const tour = await Tour.create(req.body);
     res.status(201).json({

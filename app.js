@@ -1,6 +1,6 @@
 import express from "express";
 import userRouter from "./routes/userRoute.js";
-import tourRoutes from "./routes/tourRoutes";
+import tourRoutes from "./routes/tourRoutes.js";
 const app = express();
 app.use(express.json({ limit: "5kb" }));
 
