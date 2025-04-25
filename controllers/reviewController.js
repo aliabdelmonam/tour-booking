@@ -1,4 +1,5 @@
-import { Review } from "../models/userModel.js";
+import mongoose from "mongoose";
+import Review from "../models/reviewModel.js";
 
 export async function createReview(req, res) {
     /*
@@ -23,6 +24,7 @@ export async function createReview(req, res) {
         });
     }
 }
+
 export async function getAllReviews(req, res) {
     /*
         this function returns all the reviews in the database
@@ -47,6 +49,42 @@ export async function getAllReviews(req, res) {
     }
 }
 
+export async function getReviewByReviewId(req, res) {
+    /*
+        This function returns a review in the database by its ID
+        http://localhost:8080/api/v1/review/get_Reviews_ById/review_id
+    */
+    try {
+        const { review_id } = req.params;
+
+        // Validate the review_id
+        if (!mongoose.Types.ObjectId.isValid(review_id)) {
+            return res.status(400).json({
+                status: "fail",
+                message: "Invalid review ID format",
+            });
+        }
+
+        const review = await Review.findById(review_id);
+        if (!review) {
+            return res.status(404).json({
+                status: "fail",
+                message: "No review found with this ID",
+            });
+        }
+
+        res.status(200).json({
+            status: "Success",
+            data: { review },
+        });
+    } catch (err) {
+        console.log(err); // For debugging
+        res.status(400).json({
+            status: "fail",
+            message: err.message,
+        });
+    }
+}
 
 export async function getReviewsByUserId(req, res) {
     /*
@@ -200,3 +238,4 @@ export async function updateReviewByReviewId(req,res){
 
 
 }
+

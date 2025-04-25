@@ -54,38 +54,9 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const reviewSchema = new mongoose.Schema({
-  review: {
-    type: String,
-    required: [true, "Review cannot be empty"],
-  },
-  rating: {
-    type: Number,
-    min: 1,
-    max: 5,
-    required: [true, "Rating is required"],
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },/*  Uncommented when we have tour module
-  tour: {
-    type: mongoose.Schema.ObjectId,
-    ref: "Tour",
-    required: [true, "Review must belong to a tour"],
-  },*/
-  user_id: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
-    required: [true, "Review must belong to a user"],
-  },
-});
-
 userSchema.pre("save", hashPasswordHook);
-reviewSchema.pre("save", hashPasswordHook);
 
 const User = mongoose.model("User", userSchema);
-const Review = mongoose.model("Review", reviewSchema);
 
 
-export { User as default, Review };
+export { User as default };
