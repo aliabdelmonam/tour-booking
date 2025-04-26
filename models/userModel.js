@@ -1,10 +1,35 @@
 import mongoose from "mongoose";
-import { validateEmail, validatePassword } from "../utils/validate.js";
+import {
+  validateDateOfBirth,
+  validateEmail,
+  validatePassword,
+} from "../utils/validate.js";
 import { hashPasswordHook } from "../middlewares/mogooseHooks.js";
 
 const userSchema = new mongoose.Schema(
   {
     name: {
+      type: String,
+      required: [true, "Please tell use your name"],
+    },
+    bio: {
+      type: String,
+      required: [true, "Please tell use your name"],
+    },
+    dateOdBirth: {
+      type: String,
+      required: [true, "Please tell use your name"],
+      validate: {
+        // This only works on SAVING and CREATING and not in updating.
+        validator: (val) => validateDateOfBirth(val),
+        message: "Please provide a valid Birth Date",
+      },
+    },
+    nationality: {
+      type: String,
+      required: [true, "Please tell use your name"],
+    },
+    residence: {
       type: String,
       required: [true, "Please tell use your name"],
     },
