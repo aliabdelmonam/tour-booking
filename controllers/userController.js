@@ -20,3 +20,42 @@ export async function createUser(req, res) {
     });
   }
 }
+
+export async function getAllUsers(req, res) {
+  try {
+    const users = await User.find(); // Find all users
+    res.status(200).json({
+      status: "success",
+      results: users.length, // How many users
+      data: { users }, // Return array of users
+    });
+  } catch (err) {
+    console.log("ERROR in getAllUsers...\n", err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+
+export async function getUser(req, res) {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No user found with that ID",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      data: { user },
+    });
+  } catch (err) {
+    console.log("ERROR in getUser...\n", err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
