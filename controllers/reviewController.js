@@ -10,7 +10,7 @@ export async function createReview(req, res) {
         message: the error message if it was not successfully created
     */ 
     try {
-        const { review, rating, createdAt, user_id } = req.body;
+        const { review, rating, user_id } = req.body;
         // validate if user with user_id has already booked this tour with tour_id
         /*
             const tour = await Tour.findById(tour_id);
@@ -21,7 +21,7 @@ export async function createReview(req, res) {
                 });
             }
         */ 
-        const newReview = await Review.create({ review, rating, createdAt, user_id });
+        const newReview = await Review.create({ review, rating, user_id });
         res.status(201).json({
             status: "Successfully Create Review",
             data: { review: newReview },
@@ -106,7 +106,8 @@ export async function getReviewsByUserId(req, res) {
         const reviews = await Review.find({user_id:user_id});
         if (!reviews.length) {
             return res.status(404).json({
-                status: "fail",
+                status: "Success",
+                data: { reviews: [] },
                 message: "No reviews found for this user"
             });
         }
@@ -224,8 +225,7 @@ export async function updateReviewByReviewId(req,res){
         const { review_body,rating } = req.body;
         const review =  await Review.updateOne({_id:review_id}, { $set:{
             review: review_body,
-            rating: rating,
-            createdAt:Date.now()
+            rating: rating
         }  });
         if (review.modifiedCount === 0) {
             return res.status(404).json({
