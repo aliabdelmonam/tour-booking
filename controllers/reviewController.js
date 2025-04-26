@@ -11,6 +11,16 @@ export async function createReview(req, res) {
     */ 
     try {
         const { review, rating, createdAt, user_id } = req.body;
+        // validate if user with user_id has already booked this tour with tour_id
+        /*
+            const tour = await Tour.findById(tour_id);
+            if (!tour) {
+                return res.status(404).json({
+                    status: "fail",
+                    message: "No tour found with this id",
+                });
+            }
+        */ 
         const newReview = await Review.create({ review, rating, createdAt, user_id });
         res.status(201).json({
             status: "Successfully Create Review",
@@ -239,3 +249,42 @@ export async function updateReviewByReviewId(req,res){
 
 }
 
+
+export async function getAvgRatingByTourId(req,res){
+
+    /*
+    this function returns the average rating of a tour by its ID
+    http://localhost:8080/api/v1/review/get_Avg_Rating_ByTourId/tour_id
+    */
+    try{
+        const { tour_id } = req.params;
+        const reviews =  await Review.aggregate([
+            {
+                $match: { tour: mongoose.Types.ObjectId(tour_id) }
+            },
+            {
+                $group: {
+                    _id: null,
+                    avgRating: { $avg: "$rating" }
+                }
+            }
+        ]);
+        if (reviews.length === 0) {
+            return res.status(404).json({
+                status: "fail",
+                message: "No review found with this id"
+            });
+        }
+        res.status(200).json({
+            status: "Success",
+            data: { avgRating: reviews[0].avgRating }
+        });
+    } catch(error){
+        console.log(error); // for Debugging
+        res.status(400).json({
+            status: "fail",
+            message: error.message
+        });
+    }
+
+}
