@@ -1,4 +1,81 @@
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
+
+// ---------------
+
+const signToken = (id) =>
+  jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_DURATION,
+  });
+
+const createAndSendToken = (realUser, statusCode, req, res) => {
+  const user = { ...realUser };
+  const token = signToken(realUser._id);
+
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() +
+        process.env.JWT_COOKIE_EXPIRES_DURATION * 24 * 60 * 60 * 1000,
+    ),
+    httpOnly: true,
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+  });
+  user.password = undefined;
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: { user },
+  });
+};
+
+export async function signUp(req, res, next) {
+  try {
+    if (await User.findOne({ email: req.body.email })) {
+      throw new Error("This email is already existed try to login instead");
+    }
+
+    // SECURITY: So that the user don't provide a Rule For himself
+    const newUser = await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      passwordConfirm: req.body.passwordConfirm,
+    });
+    createAndSendToken(newUser, 201, req, res);
+  } catch (err) {
+    console.log("ERROR in signUp...\n", err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+
+export async function login(req, res, next) {
+  try {
+    const { email, password } = req.body;
+
+    // 1) Check if email and password exist
+    if (!email || !password) {
+      throw new Error("Please provide email and password");
+    }
+    // 2) Check if the user exist && password is correct
+    const user = await User.findOne({ email }).select("+password"); // Query return promises
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      throw new Error("Incorrect email or password");
+    }
+
+    // 3) If every thing ok, send token to the client
+    createAndSendToken(user, 200, req, res);
+  } catch (err) {
+    console.log("ERROR in login...\n", err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
 
 export async function createUser(req, res) {
   try {
@@ -42,10 +119,7 @@ export async function getUser(req, res) {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({
-        status: "fail",
-        message: "No user found with that ID",
-      });
+      throw new Error("No user found with that ID");
     }
     res.status(200).json({
       status: "success",
