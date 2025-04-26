@@ -14,11 +14,10 @@ const userSchema = new mongoose.Schema(
     },
     bio: {
       type: String,
-      required: [true, "Please tell use your name"],
     },
     dateOdBirth: {
       type: String,
-      required: [true, "Please tell use your name"],
+      required: [true, "Please provide date of birth"],
       validate: {
         // This only works on SAVING and CREATING and not in updating.
         validator: (val) => validateDateOfBirth(val),
@@ -27,11 +26,11 @@ const userSchema = new mongoose.Schema(
     },
     nationality: {
       type: String,
-      required: [true, "Please tell use your name"],
+      required: [true, "Please provide your nationality"],
     },
     residence: {
       type: String,
-      required: [true, "Please tell use your name"],
+      required: [true, "Please provide residence"],
     },
     email: {
       type: String,
