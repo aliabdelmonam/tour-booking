@@ -5,7 +5,7 @@ export async function createUser(req, res) {
     const newUser = await User.create(req.body);
 
     newUser.password = undefined;
-    // This is no need to remove `passwordConfirm` as it is removed in encyption Hook
+    // This is no need to remove `passwordConfirm` as it is removed in encryption Hook
     // But I am doing it for the sake of clarity.
     newUser.passwordConfirm = undefined;
 
