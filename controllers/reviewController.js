@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import Review from "../models/reviewModel.js";
+import User from "../models/userModel.js";
+import axios from "axios";
 
 export async function createReview(req, res) {
     /*
@@ -11,6 +13,18 @@ export async function createReview(req, res) {
     */ 
     try {
         const { review, rating, user_id } = req.body;
+
+        // console.log("Received user_id:", user_id);
+        // Check if user exists
+        const userExists = await User.findById(user_id);
+        // console.log("User found:", userExists);
+        if (!userExists) {
+            return res.status(404).json({
+                status: "fail",
+                message: "User not found",
+            });
+        }
+
         // validate if user with user_id has already booked this tour with tour_id
         /*
             const tour = await Tour.findById(tour_id);
@@ -22,6 +36,22 @@ export async function createReview(req, res) {
             }
         */ 
         const newReview = await Review.create({ review, rating, user_id });
+        const mongoId = newReview._id.toString();
+        try {
+            await axios.post("http://localhost:8000/upsert_review", {
+                review: review,
+                rating: rating,
+                user_id: mongoId
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                status: "fail",
+                message: "Failed to create review in Pinecone",
+            });
+        }
+        
+
         res.status(201).json({
             status: "Successfully Create Review",
             data: { review: newReview },
