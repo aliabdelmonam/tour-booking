@@ -8,6 +8,8 @@ const discountSchema = new mongoose.Schema({
   value: { type: Number, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 
   // Discount eligibility
   discountType: {

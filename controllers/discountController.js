@@ -11,6 +11,8 @@ export const createDiscount = async (req, res) => {
       value,
       startDate,
       endDate,
+      createdAt,
+      updatedAt,
       discountType,
       eligibleUsers,
       applicableTours,
@@ -32,6 +34,8 @@ export const createDiscount = async (req, res) => {
       value,
       startDate,
       endDate,
+      createdAt,
+      updatedAt,
       discountType,
       eligibleUsers,
       applicableTours,
@@ -121,6 +125,7 @@ export const validateDiscount = async (req, res) => {
 };
 
 // Apply discount to a tour price (not modifying the tour, just calculating)
+
 // export const applyDiscount = async (req, res) => {
 //   try {
 //     const { tourId, discountCode } = req.body;
@@ -225,6 +230,8 @@ export const updateDiscount = async (req, res) => {
       }
     }
 
+    // Update the updatedAt field to the current date
+    req.body.updatedAt = new Date();
     const updatedDiscount = await Discount.findByIdAndUpdate(
       req.params.id,
       req.body,
