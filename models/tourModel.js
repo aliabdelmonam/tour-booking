@@ -25,9 +25,17 @@ const tourSchema = new mongoose.Schema({
     type: Number,
     default: 4.5
   },
-  price: {
+  originalPrice: {
     type: Number,
     required: [true, 'A tour must have a price']
+  },
+  finalPrice: {
+    type: Number,
+    required: [true, 'A tour may have two prices befor , after discount']
+  },
+  discountID: {
+    type: String,
+    required: [true, 'A tour may have a discount with id']
   },
   guide: {
     type: mongoose.Schema.Types.ObjectId,
