@@ -9,3 +9,8 @@ export function validatePassword(password) {
   const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
   return regex.test(password);
 }
+
+export function validateDateOfBirth(birthDate) {
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  return regex.test(birthDate);
+}
