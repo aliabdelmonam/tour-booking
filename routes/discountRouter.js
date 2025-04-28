@@ -6,12 +6,11 @@ const discountRouter = express.Router();
 // TODO: Add authentication middleware
 discountRouter.route("/").post(discountController.createDiscount);
 discountRouter.route("/validate").post(discountController.validateDiscount);
-// discountRouter.route("/apply").post(discountController.applyDiscount);
-discountRouter.route("/").get(discountController.getAllDiscounts);
-discountRouter
-  .route("/:id")
-  .get(discountController.getDiscountById)
-  .patch(discountController.updateDiscount)
-  .delete(discountController.deleteDiscount);
+
+
+discountRouter.route("/apply").post(discountController.applyDiscount);
+discountRouter.route('/').get(discountController.getAllDiscounts);
+discountRouter.route('/:id').get(discountController.getDiscountById).patch(discountController.updateDiscount).delete(discountController.deleteDiscount);
+
 
 export default discountRouter;

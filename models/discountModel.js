@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import User from "./userModel.js"; // Assuming we have a User model
-// import Tour from "./tourModel.js"; // Assuming we have a Tour model
+import Tour from "./tourModel.js"; // Assuming we have a Tour model
 
 const discountSchema = new mongoose.Schema({
   code: { type: String, required: true, unique: true },
@@ -24,8 +24,8 @@ const discountSchema = new mongoose.Schema({
   // Only required if tour-specific
   applicableTours: [{ type: mongoose.Schema.ObjectId, ref: "Tour" }],
 
-  usageLimit: { type: Number, default: null, required: true },
-  usageCount: { type: Number, default: 0, required: true },
+  usageLimit: { type: Number, default: null },
+  usageCount: { type: Number, default: 0 },
 });
 
 // Pre-save middleware to validate users and tours
@@ -37,12 +37,12 @@ discountSchema.pre("save", async function (next) {
     }
   }
 
-  // if (this.discountType === "tour-specific" && this.applicableTours.length > 0) {
-  //   const tours = await Tour.find({ _id: { $in: this.applicableTours } });
-  //   if (tours.length !== this.applicableTours.length) {
-  //     return next(new Error("One or more applicable tours do not exist in the database"));
-  //   }
-  // }
+  if (this.discountType === "tour-specific" && this.applicableTours.length > 0) {
+    const tours = await Tour.find({ _id: { $in: this.applicableTours } });
+    if (tours.length !== this.applicableTours.length) {
+      return next(new Error("One or more applicable tours do not exist in the database"));
+    }
+  }
 
   next();
 });
