@@ -65,73 +65,6 @@ export const createDiscount = async (req, res) => {
   }
 };
 
-// Validate if a discount can be applied
-
-// export const validateDiscount = async (req, res) => {
-//   try {
-//     const { discountCode, tourId, userId } = req.body;
-
-//     const discount = await Discount.findOne({ discountCode });
-
-//     // Check if discount exists
-//     if (!discount) {
-//       return res.status(404).json({
-//         status: "fail",
-//         message: "Discount code not found",
-//       });
-//     }
-
-//     // Check validity period
-//     const now = new Date();
-//     if (now < discount.startDate || now > discount.endDate) {
-//       return res.status(400).json({
-//         status: "fail",
-//         message: "Discount code has expired or not yet active",
-//       });
-//     }
-
-//     // Check usage limit
-//     if (discount.usageLimit && discount.usageCount >= discount.usageLimit) {
-//       return res.status(400).json({
-//         status: "fail",
-//         message: "Discount usage limit reached",
-//       });
-//     }
-
-//     // Check if tour is eligible
-//     if (discount.discountType === "tour-specific" && discount.applicableTours.length > 0) {
-//       if (!discount.applicableTours.includes(tourId)) {
-//         return res.status(400).json({
-//           status: "fail",
-//           message: "Discount not applicable for this tour",
-//         });
-//       }
-//     }
-
-//     // Check if user is eligible (if user-specific discount)
-//     if (discount.discountType === "user-specific" && discount.eligibleUsers.length > 0) {
-//       if (!discount.eligibleUsers.includes(userId)) {
-//         return res.status(400).json({
-//           status: "fail",
-//           message: "Discount not applicable for this user",
-//         });
-//       }
-//     }
-
-//     res.status(200).json({
-//       status: "success",
-//       data: {
-//         discount,
-//         isValid: true,
-//       },
-//     });
-//   } catch (err) {
-//     res.status(400).json({
-//       status: "fail",
-//       message: err.message,
-//     });
-//   }
-// };
 
 export const validateDiscount = async (req, res) => {
   try {
@@ -187,52 +120,6 @@ const validateDiscountHelper = async (discountCode, tourId, userId) => {
 
 // (Not completed : Waiting for tour module to be completed)
 // Apply discount to a tour price (not modifying the tour, just calculating)
-
-// export const applyDiscount = async (req, res) => {
-//   try {
-    
-//     const { discountCode, tourId } = req.body;
-
-//     // Find tour and discount
-//     const discount = await Discount.findOne({ code: discountCode });
-//     const tour = await Tour.findById(tourId);
-
-//     if (!tour || !discount) {
-//       return res.status(404).json({
-//         status: "fail",
-//         message: "Tour or discount not found",
-//       });
-//     }
-
-//     // Calculate discounted price
-//     let discountedPrice = tour.price;
-//     if (discount.type === "percentage") {
-//       discountedPrice = tour.price * (1 - discount.value / 100);
-//     } else if (discount.type === "fixed") {
-//       discountedPrice = Math.max(0, tour.price - discount.value);
-//     }
-
-//     // We don't modify the tour price in the database
-//     // We just return the calculated discounted price but we will update the Final price in the tour later
-
-//     res.status(200).json({
-//       status: "success",
-//       data: {
-//         tour: tour,
-//         originalPrice: tour.price,
-//         discountedPrice: discountedPrice,
-//         discount: discount,
-//         savings: tour.price - discountedPrice,
-//       },
-//     });
-//   } catch (err) {
-//     res.status(400).json({
-//       status: "fail",
-//       message: err.message,
-//     });
-//   }
-// };
-
 export const applyDiscount = async (req, res) => {
   try {
     const { discountCode, tourId, userId } = req.body;
@@ -256,6 +143,10 @@ export const applyDiscount = async (req, res) => {
     } else if (discount.type === "fixed") {
       discountedPrice = Math.max(0, tour.price - discount.value);
     }
+    
+    tour.discountID = discount.code;
+    tour.finalPrice = discountedPrice;
+    await tour.save();
 
     res.status(200).json({
       status: "success",
@@ -355,13 +246,24 @@ export const updateDiscount = async (req, res) => {
     }
     
     // Check if the discount code has been used in a tour so we must edit the new price and update the usage count
-    
+    const tours = await Tour.find({ discountID: req.body.code });
+    if (tours.length > 0) {
+      for (const tour of tours) {
+        if (req.body.type === "percentage") {
+          tour.finalPrice = tour.originalPrice * (1 - req.body.value / 100);
+        } else if (req.body.type === "fixed") {
+          tour.finalPrice = Math.max(0, tour.originalPrice - req.body.value);
+        }
+        await tour.save();
+      }
+    }
 
     res.status(200).json({
       status: "success",
-      data: {
+      discount: {
         discount: updatedDiscount,
       },
+      tours: tours,
     });
   } catch (err) {
     res.status(400).json({
@@ -404,12 +306,19 @@ export const deleteDiscount = async (req, res) => {
         }
      */
 
-    // Check if the discount code has been used in a tour so we must edit the new price, remove the id from tour, and update the usage count
+    // Check if the discount code has been used in a tour so we must edit the new price and remove the id from tour
+    const tours = await Tour.find({ discountID: req.body.code });
+    if (tours.length > 0) {
+      for (const tour of tours) {
+        tour.discountID = null; // Remove the discount ID from the tour
+        tour.finalPrice = tour.originalPrice; // Reset the final price to the original price
+        await tour.save();
+      }
+    }
     
     // await Discount.findByIdAndDelete(req.params.id);
     // we will not delete the discount but we will set its end date to the current date and set the usage count to 0
     discount.endDate = new Date();
-    discount.usageCount = 0;
     await discount.save();
 
     res.status(200).json({
@@ -425,3 +334,34 @@ export const deleteDiscount = async (req, res) => {
     });
   }
 };
+
+export const updateDiscountUsage = async (req, res) => {
+  try {
+    const { discountCode } = req.body;
+
+    // Find the discount
+    const discount = await Discount.findOne({ code: discountCode });
+    if (!discount) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Discount not found",
+      });
+    }
+
+    // Increment the usage count
+    discount.usageCount += 1;
+    await discount.save();
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        discount,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
