@@ -1,4 +1,5 @@
 /node_modules
 
 ## We will not remove it as it is a private environment variable
-# config.env
+# config.env*.pyc
+__pycache__/

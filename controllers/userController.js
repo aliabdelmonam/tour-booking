@@ -47,13 +47,12 @@ export async function signUp(req, res, next) {
       residence: req.body.residence
     });
 
-    const { name, bio, dateOdBirth, nationality, residence, email } = req.body;
+    const { name, dateOdBirth, nationality, residence, email } = req.body;
     try {
         const mongoId = newUser._id.toString();
         // console.log("guide Name",guideName.name);
         await axios.post("http://localhost:8000/upsert_user", {
         name: name,
-        bio: bio,
         dateOdBirth: dateOdBirth,
         nationality: nationality,
         residence: residence,

@@ -15,11 +15,7 @@ export async function createReview(req, res) {
     */ 
     try {
         const { review, rating, user_id, tour_id } = req.body;
-
-        // console.log("Received user_id:", user_id);
-        // Check if user exists
         const userExists = await User.findById(user_id);
-        // console.log("User found:", userExists);
         if (!userExists) {
             return res.status(404).json({
                 status: "fail",
