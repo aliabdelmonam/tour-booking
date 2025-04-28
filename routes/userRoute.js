@@ -1,13 +1,15 @@
 import express from "express";
-import {
-  createUser,
+import { 
+  signUp, 
+  login, 
+  createUser, 
+  getAllUsers, 
+  getUser, 
+  updateUser, 
   deleteUser,
-  getAllUsers,
-  getUser,
-  login,
-  signUp,
-  updateUser,
+  searchUsersByName 
 } from "../controllers/userController.js";
+
 import {
   restrictTo,
   retriveIdAfterTokenAuth,
