@@ -133,3 +133,55 @@ export async function getUser(req, res) {
     });
   }
 }
+
+export async function updateUser(req, res) {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true, // return the updated document
+      runValidators: true, 
+    });
+
+    if (!user) {
+      throw new Error("No user found with that ID");
+    }
+
+    user.password = undefined;
+    user.passwordConfirm = undefined;
+
+    res.status(200).json({
+      status: "success",
+      data: { user },
+    });
+  } catch (err) {
+    console.log("ERROR in updateUser...\n", err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+
+export async function deleteUser(req, res) {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+
+    if (!user) {
+      throw new Error("No user found with that ID");
+    }
+
+    res.status(204).json({ // 204 = No Content
+      status: "success",
+      data: null,
+    });
+  } catch (err) {
+    console.log("ERROR in deleteUser...\n", err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+
+
+
+
