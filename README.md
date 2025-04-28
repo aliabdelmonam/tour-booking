@@ -1,6 +1,7 @@
 # 🗺️ Tour Booking Website
 
-A full-featured tour booking platform where users can **browse tours**, **purchase tickets**, and **own their bookings**. This backend service powers core operations such as user management, tour listing, payment integration, and ticket ownership using a clean and scalable architecture.
+A **full-featured tour booking platform** where users can **browse tours**, **purchase tickets**, and **manage their bookings**.  
+This backend service powers essential operations such as **user management**, **tour listings**, **payment integration**, and **ticket ownership**, all built with a **clean**, **scalable architecture**.
 
 ---
 
@@ -30,16 +31,37 @@ npm install
 
 ---
 
-To run the server in **production mode**
+## 🚀 Running the Server
+
+To run the server in **production mode**:
 
 ```bash
 npm run start
 ```
 
-To run the server in **development mode** with auto-restart on file changes:
+To run the server in **development mode** (with auto-restart on file changes):
 
 ```bash
 npm run dev
+```
+
+---
+
+## 🔍 Semantic Search Service
+
+> **Important:**  
+> To use the **semantic search** endpoint, you must run a separate Python service.
+
+1. Install the required Python dependencies:
+
+```bash
+pip install fastapi pinecone
+```
+
+2. Start the semantic search server:
+
+```bash
+uvicorn semantic_search:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ---
@@ -52,7 +74,7 @@ Thanks to our amazing team who made this project possible:
 - Mohamed Khaled
 - Ahmed Khaled
 - Alaa Gaber
-- Ali Abdelmonean
+- Ali Abdelmoneam
 - Eslam Mohamed
 
 ---
