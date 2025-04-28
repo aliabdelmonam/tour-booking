@@ -9,9 +9,6 @@ const router = express.Router();
 router.use(tokenAuth);
 router.post("/", restrictTo("admin", "guide"), bookingController.createBooking);
 
-// Route to update a booking
-router.patch("/:id", restrictTo("admin"), bookingController.updateBooking);
-
 // Route to delete a booking
 router.delete("/:id", restrictTo("admin"), bookingController.deleteBooking);
 
