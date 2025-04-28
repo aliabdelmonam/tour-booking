@@ -135,14 +135,18 @@ export const applyDiscount = async (req, res) => {
         message: "Tour not found",
       });
     }
-
+    
+    
     // Calculate discounted price
-    let discountedPrice = tour.price;
+    let discountedPrice = tour.originalPrice;
     if (discount.type === "percentage") {
-      discountedPrice = tour.price * (1 - discount.value / 100);
+      discountedPrice = tour.originalPrice * (1 - discount.value / 100);
     } else if (discount.type === "fixed") {
-      discountedPrice = Math.max(0, tour.price - discount.value);
+      discountedPrice = Math.max(0, tour.originalPrice - discount.value);
     }
+    
+    // tour.updateDiscountID(discount.code);
+    // tour.updateFinalPrice(discountedPrice);
     
     tour.discountID = discount.code;
     tour.finalPrice = discountedPrice;
@@ -152,10 +156,10 @@ export const applyDiscount = async (req, res) => {
       status: "success",
       data: {
         tour: tour,
-        originalPrice: tour.price,
+        originalPrice: tour.originalPrice,
         discountedPrice: discountedPrice,
         discount: discount,
-        savings: tour.price - discountedPrice,
+        savings: tour.originalPrice - discountedPrice,
       },
     });
   } catch (err) {
