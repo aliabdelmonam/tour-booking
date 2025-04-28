@@ -41,3 +41,18 @@ To run the server in **development mode** with auto-restart on file changes:
 ```bash
 npm run dev
 ```
+
+---
+
+## 👥 Contributors
+
+Thanks to our amazing team who made this project possible:
+
+- Ahmed Hussein
+- Mohamed Khaled
+- Ahmed Khaled
+- Alaa Gaber
+- Ali Abdelmonean
+- Eslam Mohamed
+
+---

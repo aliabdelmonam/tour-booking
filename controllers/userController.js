@@ -157,3 +157,87 @@ export async function getUser(req, res) {
     });
   }
 }
+
+export async function updateUser(req, res) {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true, // return the updated document
+      runValidators: true,
+    });
+
+    if (!user) {
+      throw new Error("No user found with that ID");
+    }
+
+    user.password = undefined;
+    user.passwordConfirm = undefined;
+
+    res.status(200).json({
+      status: "success",
+      data: { user },
+    });
+  } catch (err) {
+    console.log("ERROR in updateUser...\n", err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+
+export async function deleteUser(req, res) {
+  try {
+    // NOTE: We don't want to delete the user from the database
+    // We just want to set the active field to false
+    // So that we can use it later if we want to
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { active: false },
+      {
+        new: true, // return the updated document
+        runValidators: false,
+      },
+    );
+    if (!user) {
+      throw new Error("No user found with that ID");
+    }
+
+    res.status(204).json({
+      // 204 = No Content
+      status: "success",
+      data: null,
+    });
+  } catch (err) {
+    console.log("ERROR in deleteUser...\n", err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+export async function searchUsersByName(req, res) {
+  try {
+    const { name } = req.query;
+
+    if (!name) {
+      throw new Error("Please provide a name to search for");
+    }
+
+    const users = await User.find({
+      name: { $regex: name, $options: "i" },
+    });
+
+    res.status(200).json({
+      status: "success",
+      results: users.length,
+      data: { users },
+    });
+  } catch (err) {
+    console.log("ERROR in searchUsersByName...\n", err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+
