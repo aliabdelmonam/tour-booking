@@ -143,6 +143,10 @@ export const applyDiscount = async (req, res) => {
     } else if (discount.type === "fixed") {
       discountedPrice = Math.max(0, tour.price - discount.value);
     }
+    
+    tour.discountID = discount.code;
+    tour.finalPrice = discountedPrice;
+    await tour.save();
 
     res.status(200).json({
       status: "success",
@@ -242,13 +246,24 @@ export const updateDiscount = async (req, res) => {
     }
     
     // Check if the discount code has been used in a tour so we must edit the new price and update the usage count
-    
+    const tours = await Tour.find({ discountID: req.body.code });
+    if (tours.length > 0) {
+      for (const tour of tours) {
+        if (req.body.type === "percentage") {
+          tour.finalPrice = tour.originalPrice * (1 - req.body.value / 100);
+        } else if (req.body.type === "fixed") {
+          tour.finalPrice = Math.max(0, tour.originalPrice - req.body.value);
+        }
+        await tour.save();
+      }
+    }
 
     res.status(200).json({
       status: "success",
-      data: {
+      discount: {
         discount: updatedDiscount,
       },
+      tours: tours,
     });
   } catch (err) {
     res.status(400).json({
@@ -291,12 +306,19 @@ export const deleteDiscount = async (req, res) => {
         }
      */
 
-    // Check if the discount code has been used in a tour so we must edit the new price, remove the id from tour, and update the usage count
+    // Check if the discount code has been used in a tour so we must edit the new price and remove the id from tour
+    const tours = await Tour.find({ discountID: req.body.code });
+    if (tours.length > 0) {
+      for (const tour of tours) {
+        tour.discountID = null; // Remove the discount ID from the tour
+        tour.finalPrice = tour.originalPrice; // Reset the final price to the original price
+        await tour.save();
+      }
+    }
     
     // await Discount.findByIdAndDelete(req.params.id);
     // we will not delete the discount but we will set its end date to the current date and set the usage count to 0
     discount.endDate = new Date();
-    discount.usageCount = 0;
     await discount.save();
 
     res.status(200).json({
@@ -312,3 +334,34 @@ export const deleteDiscount = async (req, res) => {
     });
   }
 };
+
+export const updateDiscountUsage = async (req, res) => {
+  try {
+    const { discountCode } = req.body;
+
+    // Find the discount
+    const discount = await Discount.findOne({ code: discountCode });
+    if (!discount) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Discount not found",
+      });
+    }
+
+    // Increment the usage count
+    discount.usageCount += 1;
+    await discount.save();
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        discount,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
