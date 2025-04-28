@@ -5,13 +5,18 @@ from pydantic import BaseModel
 from typing import Optional
 # from fastapi.encoders import jsonable_encoder
 from fastapi import Query
+import os
+from dotenv import load_dotenv
+from pathlib import Path
 
 # Initialize Pinecone
 
 
 app = FastAPI()
-
-pc = Pinecone(api_key="pcsk_3SVALu_3KiyxeVKQcWDFYGu36PPRgmeXXUzQQJgz1jaau4oASexr3DT35mFBvxiVD5HoZD")
+parent_dir = Path(__file__).parent.parent
+env_path = parent_dir / "config.env"
+load_dotenv(dotenv_path=env_path)
+pc = Pinecone(api_key=os.getenv("PINE_CONE_API"))
 
 # Connect to your index
 index = pc.Index("semantic-search")
