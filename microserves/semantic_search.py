@@ -31,7 +31,7 @@ async def upsert_review_to_pinecone(payload: ReviewRequest):
     try:
         record_id = f"{payload.user_id}_review_id"  # This is your ID
         combined_text =f"{payload.review} {payload.rating}"
-        await index.upsert_records(
+        index.upsert_records(
             "",  # namespace argument, empty string if no namespace
             records=[{
             "id" : record_id,
@@ -63,7 +63,7 @@ async def upsert_tour_to_pinecone(payload: TourRequest):
         record_id = f"{payload.tour_id}_tour_id"  # This is your ID
         # print("record_id", record_id)
         combined_text =f"{payload.name} {payload.description} {payload.duration} {payload.price} {payload.guide}"
-        await index.upsert_records(
+        index.upsert_records(
             "",  # namespace argument, empty string if no namespace
             records=[{
             "id" : record_id,
@@ -82,7 +82,6 @@ async def upsert_tour_to_pinecone(payload: TourRequest):
 
 class UserRequest(BaseModel):
     name: str
-    bio: str
     dateOdBirth: str
     nationality: str
     residence : str
@@ -93,15 +92,14 @@ async def upsert_user_to_pinecone(payload: UserRequest):
     try:
         record_id = f"{payload.user_id}_user_id"  # This is your ID
         # print("record_id", record_id)
-        combined_text =f"{payload.name} {payload.bio} {payload.dateOdBirth} {payload.nationality} {payload.residence} {payload.email}"
+        combined_text =f"{payload.name} {payload.dateOdBirth} {payload.nationality} {payload.residence} {payload.email}"
         print("combined_text", combined_text)
-        await index.upsert_records(
+        index.upsert_records(
             "",  # namespace argument, empty string if no namespace
             records=[{
             "id" : record_id,
             "text": combined_text,
             "name": payload.name,  # Changed key from 'description' to 'name' to match Pinecone field mapping
-            "bio": payload.bio,
             "dateOdBirth": payload.dateOdBirth,
             "nationality": payload.nationality,
             "residence": payload.residence,
