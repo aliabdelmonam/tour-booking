@@ -44,6 +44,7 @@
  *         description: Invalid input
  */
 
+
 /**
  * @swagger
  * /api/v1/bookings/{id}:
