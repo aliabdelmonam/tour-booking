@@ -42,13 +42,9 @@ export async function createReview(req, res) {
                 message: "You have not booked this tour",
             });
         }
-
         // validate if user with user_id has already booked this tour with tour_id
-        
-            
-        
         const newReview = await Review.create({ review, rating, tour_id: tour_id, user_id: user_id });
-        /*const mongoId = newReview._id.toString();
+        const mongoId = newReview._id.toString();
         try {
             await axios.post("http://localhost:8000/upsert_review", {
                 review: review,
@@ -61,7 +57,7 @@ export async function createReview(req, res) {
                 status: "fail",
                 message: "Failed to create review in Pinecone",
             });
-        }*/
+        }
         
 
         res.status(201).json({
