@@ -44,46 +44,6 @@
  *         description: Invalid input
  */
 
-/**
- * @swagger
- * /api/v1/bookings/{id}:
- *   patch:
- *     summary: Update a booking (only price and paid allowed)
- *     tags: [Bookings]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Booking ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               price:
- *                 type: number
- *                 description: Updated price
- *               paid:
- *                 type: boolean
- *                 description: Payment status
- *     responses:
- *       200:
- *         description: Booking updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Booking'
- *       400:
- *         description: Invalid input
- *       404:
- *         description: Booking not found
- */
 
 /**
  * @swagger
