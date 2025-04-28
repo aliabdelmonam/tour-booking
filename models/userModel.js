@@ -18,11 +18,11 @@ const userSchema = new mongoose.Schema(
     dateOdBirth: {
       type: String,
       required: [true, "Please provide date of birth"],
-      validate: {
+     // validate: {
         // This only works on SAVING and CREATING and not in updating.
-        validator: (val) => validateDateOfBirth(val),
-        message: "Please provide a valid Birth Date",
-      },
+       // validator: (val) => validateDateOfBirth(val),
+     //   message: "Please provide a valid Birth Date",
+  //    },
     },
     nationality: {
       type: String,
