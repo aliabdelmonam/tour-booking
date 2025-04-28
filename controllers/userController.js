@@ -138,7 +138,7 @@ export async function updateUser(req, res) {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true, // return the updated document
-      runValidators: true, 
+      runValidators: true,
     });
 
     if (!user) {
@@ -163,13 +163,23 @@ export async function updateUser(req, res) {
 
 export async function deleteUser(req, res) {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
-
+    // NOTE: We don't want to delete the user from the database
+    // We just want to set the active field to false
+    // So that we can use it later if we want to
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { active: false },
+      {
+        new: true, // return the updated document
+        runValidators: false,
+      },
+    );
     if (!user) {
       throw new Error("No user found with that ID");
     }
 
-    res.status(204).json({ // 204 = No Content
+    res.status(204).json({
+      // 204 = No Content
       status: "success",
       data: null,
     });
@@ -181,7 +191,3 @@ export async function deleteUser(req, res) {
     });
   }
 }
-
-
-
-
