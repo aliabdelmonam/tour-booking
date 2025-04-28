@@ -54,7 +54,6 @@ class TourRequest(BaseModel):
     name: str
     description: str
     duration: int
-    price: int
     guide: str
     tour_id: str
 @app.post('/upsert_tour')
@@ -62,14 +61,13 @@ async def upsert_tour_to_pinecone(payload: TourRequest):
     try:
         record_id = f"{payload.tour_id}_tour_id"  # This is your ID
         # print("record_id", record_id)
-        combined_text =f"{payload.name} {payload.description} {payload.duration} {payload.price} {payload.guide}"
+        combined_text =f"{payload.name} {payload.description} {payload.duration}  {payload.guide}"
         index.upsert_records(
             "",  # namespace argument, empty string if no namespace
             records=[{
             "id" : record_id,
             "text": combined_text,  # Changed key from 'review' to 'description' to match Pinecone field mapping
             "duration": payload.duration,
-            "price": payload.price,
             "guide": payload.guide,
             "type" : 'tour'
             }]
