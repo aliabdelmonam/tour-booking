@@ -125,13 +125,11 @@ async def search_pinecone(query: str = Query(...), type: Optional[str] = Query(N
             query={
                 "inputs": {"text": query},
                 "top_k": 5,
-                # "filter": filter
+                "filter": filter
             },
-            # fields=["name", "bio", "duration", "price", "guide", "rating", "type"]
         )
-        # results = jsonable_encoder(results)  # Convert to JSON-serializable format
+    
         results = results.to_dict()
-        # print(results)
         return {
             "status":"success", 
            "data": results,

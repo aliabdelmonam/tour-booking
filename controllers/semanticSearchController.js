@@ -16,17 +16,11 @@ export async function semantic_search(req,res){
         const response = await axios.get("http://localhost:8000/search", {
             params: {
                  query: query.toString(),
-                //type : type ? type.toString() : undefined
+                type : type ? type.toString() : undefined
                 }
         });
-        // console.log("Response data from external service:", response.data);
-        // let results;
-        
-        // data_ = response.data.data
-        // console.log("Data from external service:", data_);
         return res.status(200).json({
             status: "success",
-            // results: response.data.results || 0,
             data: response.data.data.result.hits || []
         });
 }   catch (error) {
