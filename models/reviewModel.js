@@ -10,13 +10,12 @@ const reviewSchema = new mongoose.Schema({
     min: 1,
     max: 5,
     required: [true, "Rating is required"],
-  }
-  /*  Uncommented when we have tour module
-    ,tour: {
-      type: mongoose.Schema.ObjectId,
-      ref: "Tour",
-      required: [true, "Review must belong to a tour"],
-    },*/,
+  },
+  tour_id: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Tour",
+    required: [true, "Review must belong to a tour"],
+  },
   user_id: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
