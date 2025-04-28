@@ -191,3 +191,28 @@ export async function deleteUser(req, res) {
     });
   }
 }
+export async function searchUsersByName(req, res) {
+  try {
+    const { name } = req.query;
+
+    if (!name) {
+      throw new Error("Please provide a name to search for");
+    }
+
+    const users = await User.find({
+      name: { $regex: name, $options: "i" },
+    });
+
+    res.status(200).json({
+      status: "success",
+      results: users.length,
+      data: { users },
+    });
+  } catch (err) {
+    console.log("ERROR in searchUsersByName...\n", err);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
