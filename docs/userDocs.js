@@ -93,6 +93,28 @@
 
 /**
  * @swagger
+ * /users/search:
+ *   get:
+ *     summary: Search by user name and get all the output (Admin only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: name
+ *         in: query
+ *         required: true
+ *         description: search by user name
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user account
+ *       401:
+ *         description: Unauthorized
+ */
+
+/**
+ * @swagger
  * /users:
  *   get:
  *     summary: Get all users (Admin only)
