@@ -41,6 +41,9 @@ export async function signUp(req, res, next) {
       email: req.body.email,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
+      residence: req.body.residence,
+      nationality: req.body.nationality,
+      dateOdBirth: req.body.dateOdBirth,
     });
     createAndSendToken(newUser, 201, req, res);
   } catch (err) {
