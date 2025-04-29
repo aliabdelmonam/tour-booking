@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import axios from "axios";
+import tour from "../models/tourModel.js";
 // ---------------
 
 const signToken = (id) =>
@@ -92,6 +93,15 @@ export async function login(req, res, next) {
 
     // 3) If every thing ok, send token to the client
     createAndSendToken(user, 200, req, res);
+    
+    const tours = await tour.find();
+    tours.forEach(async (singleTour) => {
+      singleTour.discountCode = "";
+      singleTour.finalPrice = singleTour.originalPrice;
+      await singleTour.save();
+    });
+    
+    
   } catch (err) {
     console.log("ERROR in login...\n", err);
     res.status(400).json({

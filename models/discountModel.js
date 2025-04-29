@@ -14,7 +14,7 @@ const discountSchema = new mongoose.Schema({
   // Discount eligibility
   discountType: {
     type: String,
-    enum: ["public", "user-specific", "tour-specific"],
+    enum: ["public", "user-specific", "tour-specific", "user-and-tour-specific"],
     default: "public",
   },
 

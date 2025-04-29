@@ -115,6 +115,12 @@ const validateDiscountHelper = async (discountCode, tourId, userId) => {
     }
   }
 
+  if (discount.discountType === "user-and-tour-specific" && discount.eligibleUsers.length > 0 && discount.applicableTours.length > 0) {
+    if (!discount.eligibleUsers.includes(userId) || !discount.applicableTours.includes(tourId)) {
+      throw new Error("Discount not applicable for this user and tour combination");
+    }
+  }
+
   return discount;
 };
 
@@ -145,10 +151,10 @@ export const applyDiscount = async (req, res) => {
       discountedPrice = Math.max(0, tour.originalPrice - discount.value);
     }
     
-    // tour.updateDiscountID(discount.code);
+    // tour.updateDiscountCode(discount.code);
     // tour.updateFinalPrice(discountedPrice);
     
-    tour.discountID = discount.code;
+    tour.discountCode = discount.code;
     tour.finalPrice = discountedPrice;
     await tour.save();
 
@@ -250,7 +256,7 @@ export const updateDiscount = async (req, res) => {
     }
     
     // Check if the discount code has been used in a tour so we must edit the new price and update the usage count
-    const tours = await Tour.find({ discountID: req.body.code });
+    const tours = await Tour.find({ discountCode: req.body.code });
     if (tours.length > 0) {
       for (const tour of tours) {
         if (req.body.type === "percentage") {
@@ -311,10 +317,10 @@ export const deleteDiscount = async (req, res) => {
      */
 
     // Check if the discount code has been used in a tour so we must edit the new price and remove the id from tour
-    const tours = await Tour.find({ discountID: req.body.code });
+    const tours = await Tour.find({ discountCode: req.body.code });
     if (tours.length > 0) {
       for (const tour of tours) {
-        tour.discountID = null; // Remove the discount ID from the tour
+        tour.discountCode = null; // Remove the discount ID from the tour
         tour.finalPrice = tour.originalPrice; // Reset the final price to the original price
         await tour.save();
       }

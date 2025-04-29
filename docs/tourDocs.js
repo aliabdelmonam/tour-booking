@@ -54,7 +54,7 @@
  *                 type: number
  *                 description: Discounted final price
  *                 example: 999
- *               discountID:
+ *               discountCode:
  *                 type: string
  *                 description: Associated discount ID
  *                 example: "disc_6528abcxyz"
@@ -70,7 +70,7 @@
  *               - maxUsers
  *               - originalPrice
  *               - finalPrice
- *               - discountID
+ *               - discountCode
  *               - guide
  *     responses:
  *       201:
@@ -138,7 +138,7 @@
  *         finalPrice:
  *           type: number
  *           example: 999
- *         discountID:
+ *         discountCode:
  *           type: string
  *           example: "disc_6528abcxyz"
  *         guide:
