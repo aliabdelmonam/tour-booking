@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 import Review from "../models/reviewModel.js";
+import User from "../models/userModel.js";
+import Tour from "../models/tourModel.js";
+import Booking from "../models/bookingModel.js";
+import axios from "axios";
 
 export async function createReview(req, res) {
     /*
@@ -10,18 +14,48 @@ export async function createReview(req, res) {
         message: the error message if it was not successfully created
     */ 
     try {
-        const { review, rating, user_id } = req.body;
-        // validate if user with user_id has already booked this tour with tour_id
-        /*
-            const tour = await Tour.findById(tour_id);
+        const { review, rating, user_id, tour_id } = req.body;
+        const userExists = await User.findById(user_id);
+        if (!userExists) {
+            return res.status(404).json({
+                status: "fail",
+                message: "User not found",
+            });
+        }
+        // check if tour exists
+        const tour = await Tour.findById(tour_id);
             if (!tour) {
                 return res.status(404).json({
                     status: "fail",
                     message: "No tour found with this id",
                 });
             }
-        */ 
-        const newReview = await Review.create({ review, rating, user_id });
+        // check if user has already booked this tour
+        const booking = await Booking.findOne({ user: user_id, tour: tour_id });
+        if (!booking) {
+            return res.status(404).json({
+                status: "fail",
+                message: "You have not booked this tour",
+            });
+        }
+        // validate if user with user_id has already booked this tour with tour_id
+        const newReview = await Review.create({ review, rating, tour_id: tour_id, user_id: user_id });
+        const mongoId = newReview._id.toString();
+        try {
+            await axios.post("http://localhost:8000/upsert_review", {
+                review: review,
+                rating: rating,
+                user_id: mongoId
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                status: "fail",
+                message: "Failed to create review in Pinecone",
+            });
+        }
+        
+
         res.status(201).json({
             status: "Successfully Create Review",
             data: { review: newReview },
@@ -127,20 +161,21 @@ export async function getReviewsByUserId(req, res) {
     }
 }
 
-/*  Uncommented when we have tour module
+  
 export async function getReviewsByTourId(req, res) {
     /*
-        this function returns all the reviews in the database for a specific user
+        this function returns all the reviews in the database for a specific tour
     http://localhost:8080/api/v1/review/get_Reviews_ByTourId/tour_id
     */ 
-   /*
     try{
-        const {tour_id} = req.params;
-        const reviews = await Review.find({tour:tour_id});
+        const { tour_id } = req.params;
+        console.log("Tour ID:", tour_id); // for Debugging
+        const reviews = await Review.find({ tour_id: tour_id });
         if (!reviews.length) {
             return res.status(404).json({
-                status: "fail",
-                message: "No reviews found for this user"
+                status: "success",
+                data: { reviews: [] },
+                message: "No reviews found for this tour"
             });
         }
 
@@ -158,7 +193,7 @@ export async function getReviewsByTourId(req, res) {
         });
     }
 }
-*/
+
 
 export async function deleteUserReviews(req,res){
     /*
@@ -250,7 +285,7 @@ export async function updateReviewByReviewId(req,res){
 }
 
 
-export async function getAvgRatingByTourId(req,res){
+export async function getAvgRatingReviewByTourId(req,res){
 
     /*
     this function returns the average rating of a tour by its ID

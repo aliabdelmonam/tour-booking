@@ -20,7 +20,7 @@ const reviewSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "User",
     required: [true, "Review must belong to a user"],
-  },
+  }
 });
 
 const Review = mongoose.model("Review", reviewSchema);

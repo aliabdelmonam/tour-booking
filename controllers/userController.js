@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
-
+import axios from "axios";
 // ---------------
 
 const signToken = (id) =>
@@ -41,10 +41,31 @@ export async function signUp(req, res, next) {
       email: req.body.email,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
-      residence: req.body.residence,
-      nationality: req.body.nationality,
+      bio: req.body.bio,
       dateOdBirth: req.body.dateOdBirth,
+      nationality: req.body.nationality,
+      residence: req.body.residence
     });
+
+    const { name, dateOdBirth, nationality, residence, email } = req.body;
+    try {
+        const mongoId = newUser._id.toString();
+        // console.log("guide Name",guideName.name);
+        await axios.post("http://localhost:8000/upsert_user", {
+        name: name,
+        dateOdBirth: dateOdBirth,
+        nationality: nationality,
+        residence: residence,
+        email: email,
+        user_id: mongoId
+      });
+  } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+          status: "fail",
+          message: "Failed to create user in Pinecone",
+      });
+  }
     createAndSendToken(newUser, 201, req, res);
   } catch (err) {
     console.log("ERROR in signUp...\n", err);
@@ -83,7 +104,6 @@ export async function login(req, res, next) {
 export async function createUser(req, res) {
   try {
     const newUser = await User.create(req.body);
-
     newUser.password = undefined;
     // This is no need to remove `passwordConfirm` as it is removed in encryption Hook
     // But I am doing it for the sake of clarity.
@@ -93,7 +113,7 @@ export async function createUser(req, res) {
       status: "success",
       data: { user: newUser },
     });
-  } catch (err) {
+  }catch (err) {
     res.status(400).json({
       status: "fail",
       message: err.message,
@@ -219,3 +239,4 @@ export async function searchUsersByName(req, res) {
     });
   }
 }
+

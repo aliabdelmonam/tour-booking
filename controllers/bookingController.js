@@ -1,6 +1,7 @@
 import Booking from "../models/bookingModel.js";
 import Tour from "../models/tourModel.js";
-import { updateDiscount } from "./discountController.js";
+import { updateDiscountUsage } from "./discountController.js";
+
 
 // Simple function to create a booking object
 export const createBooking = async (req, res) => {
@@ -15,7 +16,7 @@ export const createBooking = async (req, res) => {
     }
 
     if (tour.originalPrice !== tour.finalPrice) {
-      updateDiscount();
+      updateDiscountUsage();
     }
 
     // Create a new booking
