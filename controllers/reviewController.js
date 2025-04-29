@@ -145,6 +145,7 @@ export async function getReviewsByUserId(req, res) {
                 message: "No reviews found for this user"
             });
         }
+        
 
         res.status(200).json({
             status: "Success",
@@ -202,6 +203,13 @@ export async function deleteUserReviews(req,res){
     */
     try{
         const { user_id } = req.params;
+        
+        if (req.user.id !== user_id && req.user.role !== 'admin') {
+            return res.status(403).json({
+              status: "fail",
+              message: "You are not authorized to delete these reviews"
+            });
+          }
         const review =  await Review.deleteMany({user_id:user_id});
         if (review.deletedCount === 0) {
             return res.status(404).json({
@@ -213,6 +221,7 @@ export async function deleteUserReviews(req,res){
             status: "Success",
             message: "Reviews deleted successfully"
         });
+
     } catch(error){
         console.log(error); // for Debugging
         res.status(400).json({
