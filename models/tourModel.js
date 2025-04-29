@@ -33,7 +33,7 @@ const tourSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'A tour may have two prices: before and after discount']
   },
-  discountID: {
+  discountCode: {
     type: String,
     required: [true, 'A tour must have a discount ID']
   },
@@ -93,8 +93,8 @@ tourSchema.methods.updateFinalPrice = function (finalPrice) {
 };
 
 // Method to update the discount ID
-tourSchema.methods.updateDiscountID = function (discountID) {
-  this.discountID = discountID;
+tourSchema.methods.updateDiscountCode = function (discountCode) {
+  this.discountCode = discountCode;
   return this.save();
 };
 
