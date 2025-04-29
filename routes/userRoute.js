@@ -1,13 +1,13 @@
 import express from "express";
-import { 
-  signUp, 
-  login, 
-  createUser, 
-  getAllUsers, 
-  getUser, 
-  updateUser, 
+import {
+  signUp,
+  login,
+  createUser,
+  getAllUsers,
+  getUser,
+  updateUser,
   deleteUser,
-  searchUsersByName 
+  searchUsersByName,
 } from "../controllers/userController.js";
 
 import {
@@ -27,6 +27,7 @@ userRouter.get("/account", retriveIdAfterTokenAuth, getUser);
 
 // Make <auth.restrictTo("admin")> a Middleware for all routes down below
 userRouter.use(restrictTo("admin"));
+userRouter.route("/search").get(searchUsersByName);
 userRouter.route("/").get(getAllUsers).post(createUser);
 userRouter.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
 

@@ -2,6 +2,7 @@ import Booking from "../models/bookingModel.js";
 import Tour from "../models/tourModel.js";
 import { updateDiscountUsage } from "./discountController.js";
 
+
 // Simple function to create a booking object
 export const createBooking = async (req, res) => {
   try {
